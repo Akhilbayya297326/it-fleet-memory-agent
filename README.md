@@ -16,6 +16,7 @@ Fleet Command maintains a centralized **Fleet Memory Bank** powered by Hindsight
 ---
 
 🏗️ Architecture & Tech Stack
+
 Memory Layer: Hindsight Cloud SDK (hindsight_client) for persistent semantic memory.
 
 LLM Engine: Groq API (openai/gpt-oss-120b) for ultra-fast, low-latency inference.
