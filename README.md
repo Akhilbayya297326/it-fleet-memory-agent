@@ -15,7 +15,7 @@ Fleet Command maintains a centralized **Fleet Memory Bank** powered by Hindsight
 
 ---
 
-🏗️ Architecture & Tech Stack
+##🏗️ Architecture & Tech Stack
 
 Memory Layer: Hindsight Cloud SDK (hindsight_client) for persistent semantic memory.
 
@@ -27,7 +27,7 @@ Resilience: Built-in automatic retry logic with exponential backoff to handle up
 
 ---
 
-## 🧠 Deep Dive: How Hindsight Memory is Utilized
+### 🧠 Deep Dive: How Hindsight Memory is Utilized
 
 Hindsight memory accounts for the core engine of this agent. The integration is broken down into three lifecycle phases:
 
@@ -55,7 +55,7 @@ Prompt Injection: When memory is active, the retrieved historical context is app
 
 ---
 
-### ⚡ Quick Start
+## ⚡ Quick Start
 1. Clone the repository: `git clone https://github.com/Akhilbayya297326/it-fleet-memory-agent.git`
 2. Install dependencies: `pip install -r requirements.txt`
 3. Add your API keys to a `.env` file (`HINDSIGHT_API_KEY` and `GROQ_API_KEY`).
