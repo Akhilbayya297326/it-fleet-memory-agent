@@ -15,7 +15,7 @@ Fleet Command maintains a centralized **Fleet Memory Bank** powered by Hindsight
 
 ---
 
-##🏗️ Architecture & Tech Stack
+### 🏗️ Architecture & Tech Stack
 
 Memory Layer: Hindsight Cloud SDK (hindsight_client) for persistent semantic memory.
 
