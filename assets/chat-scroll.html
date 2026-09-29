@@ -1,0 +1,31 @@
+<span class="chat-scroll-anchor" aria-hidden="true"></span>
+<script>
+(() => {
+  const phase = '__SCROLL_PHASE__';
+  // Observe only long enough to find the newly submitted message. Never pull
+  // readers back down while they are scrolling through a streaming response.
+  let timer;
+  let observer;
+  const selector = '.st-key-conversation .st-key-user_message___TURN_INDEX__';
+  const reveal = () => {
+    const message = document.querySelector(selector);
+    if (!message) return;
+    observer?.disconnect();
+    clearTimeout(timer);
+    setTimeout(() => {
+      const target = document.querySelector(selector);
+      const main = document.querySelector('[data-testid="stMain"]');
+      if (!target || !main) return;
+      main.scrollTo({
+        top: main.scrollTop + target.getBoundingClientRect().top - main.getBoundingClientRect().top - 22,
+        behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'
+      });
+      target.dataset.scrollPhase = phase;
+    }, phase === 'complete' ? 100 : 700);
+  };
+  observer = new MutationObserver(reveal);
+  observer.observe(document.body, { childList: true, subtree: true });
+  timer = setTimeout(() => observer.disconnect(), 5000);
+  reveal();
+})();
+</script>

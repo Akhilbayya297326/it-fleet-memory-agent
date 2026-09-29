@@ -1,4 +1,5 @@
-streamlit
-groq
-hindsight-client
+streamlit==1.64.0
+groq==1.7.0
+hindsight-client==0.10.1
 python-dotenv
+psutil>=7.2,<8
