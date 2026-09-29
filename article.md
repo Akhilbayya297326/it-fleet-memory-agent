@@ -12,6 +12,10 @@ Fleet Command combines a Streamlit support interface, local hardware diagnostics
 
 The code separates those responsibilities. `app.py` owns the conversation and resolution-entry workflow. `telemetry.py` collects operating-system readings. `services.py` handles persistence and remote calls. `seed_data.py` imports existing tickets through the same persistence functions used by the interface.
 
+![Fleet Command architecture showing verified tickets saved to SQLite, retained in Hindsight, and recalled into the Groq response workflow.](D:/Fleet-Memory-Agent/assets/hindsight-support-architecture.png)
+
+*The write path preserves verified cases; the read path supplies relevant evidence to the conversation.*
+
 Hindsight provides the memory operations that connect previous support work to a new question. The [open-source Hindsight agent memory repository](https://github.com/vectorize-io/hindsight) describes retain, recall, and reflect; my application uses retain and recall directly. Groq generates the response after the application assembles the current hardware context and any recalled resolutions.
 
 I keep three kinds of information separate: what the machine reports now, what someone said in a conversation, and what an operator verified in a previous case. Each has a different lifetime and a different claim to authority.
@@ -86,8 +90,13 @@ When synchronization runs, it retrieves the local record and calls Hindsight wit
 ```python
 with memory_connection() as client:
     client.retain(
-        bank_id=BANK_ID, content=f"Device: {row['device']} | Issue: {row['issue']} | Resolution: {row['resolution']}",
-        document_id=doc_id, tags=[VERIFIED_TAG],
+        bank_id=BANK_ID,
+        content=(
+            f"Device: {row['device']} | Issue: {row['issue']} | "
+            f"Resolution: {row['resolution']}"
+        ),
+        document_id=doc_id,
+        tags=[VERIFIED_TAG],
     )
 db.execute("UPDATE resolutions SET synced=1 WHERE id=?", (doc_id,))
 ```
@@ -102,8 +111,10 @@ Recall uses the same admission marker:
 
 ```python
 with memory_connection() as client:
-    result = client.recall(bank_id=BANK_ID, query=query,
-                          tags=[VERIFIED_TAG], tags_match="all_strict", max_tokens=2048)
+    result = client.recall(
+        bank_id=BANK_ID, query=query,
+        tags=[VERIFIED_TAG], tags_match="all_strict", max_tokens=2048,
+    )
 return "\n\n".join(item.text for item in result.results if item.text)
 ```
 
@@ -126,6 +137,10 @@ For the MacBook example, “internal sites do not resolve on office Wi-Fi” sho
 These examples describe how the ticket format supports an interaction. They are not a measured claim about retrieval accuracy.
 
 I also make absence visible. When recall returns no text, the response carries a notice explaining that it uses general guidance. When recall fails, the conversation identifies that failure separately. Finding no applicable resolution and failing to query memory deserve different explanations.
+
+![Fleet Command support conversation showing user messages on the right, assistant replies on the left, and notices that no matching verified resolution was found.](D:/Fleet-Memory-Agent/assets/chat-preview.png)
+
+*The conversation keeps follow-up context; each reply labels the absence of a matching verified resolution.*
 
 Hindsight’s practical benefit here is that I can add verified operational knowledge independently of the model. Updating the resolution library changes what the next support request can retrieve without changing the generation code.
 
